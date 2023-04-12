@@ -1,0 +1,225 @@
+unit DTCidadesIBGE;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, System.Generics.Collections,
+  System.Net.URLClient,
+  System.Net.HttpClient,
+  System.Net.HttpClientComponent, json;
+
+ const URL_Municipios = 'https://servicodados.ibge.gov.br/api/v1/localidades/municipios';
+
+type TCidades = class
+      CodIBGE   : Integer;
+      Municipio : String;
+      CodUF     : Integer;
+      UF        : string;
+end;
+
+type TRetorno = record
+      Codigo   : Integer;
+      Mensagem : String;
+end;
+
+type
+  TDTCidadesIBGE = class(TComponent)
+  private
+    FRetorno: TRetorno;
+    FRemoveAcentos: Boolean;
+    FLetrasMaiusculas: Boolean;
+    procedure SetRetorno(const Value: TRetorno);
+    procedure SetLetrasMaiusculas(const Value: Boolean);
+    procedure SetRemoveAcentos(const Value: Boolean);
+
+  protected
+
+  public
+    Cidades : TList<TCidades>;
+    function ConsultaMunicipios : TCidades;
+    function ConsultaMunicipiosPorUF( UF : string ) : TCidades;
+
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+  published
+    property Retorno          : TRetorno read FRetorno          write SetRetorno;
+    property RemoveAcentos    : Boolean  read FRemoveAcentos    write SetRemoveAcentos;
+    property LetrasMaiusculas : Boolean  read FLetrasMaiusculas write SetLetrasMaiusculas;
+  end;
+
+procedure Register;
+
+implementation
+
+procedure Register;
+begin
+  RegisterComponents('DT Inovacao', [TDTCidadesIBGE]);
+end;
+
+{ TDTCidadesIBGE }
+
+function RemoveAcento(Str: string): string;
+const
+  ComAcento = '‡‚ÍÙ˚„ı·ÈÌÛ˙Á¸¿¬ ‘€√’¡…Õ”⁄«‹%*#@!&"';
+  SemAcento = 'aaeouaoaeioucuAAEOUAOAEIOUCU      ';
+var
+   x: Integer;
+begin;
+  for x := 1 to Length(Str) do
+  	if Pos(Str[x],ComAcento) <> 0 then
+    	Str[x] := SemAcento[Pos(Str[x], ComAcento)];
+  Result := Str;
+end;
+
+function TDTCidadesIBGE.ConsultaMunicipios: TCidades;
+var
+  Cid             : TCidades;
+  HttpClient      : THttpClient;
+  Response        : IHttpResponse;
+  Jobj,obj,JsonUF : TJSONObject;
+  jsonArr         : TJSONArray;
+  I               : Integer;
+begin
+    try
+      HttpClient := THttpClient.Create;
+      HttpClient.ContentType := 'application/json';
+      HttpClient.Accept      := '/';
+
+      try
+        Response := HttpClient.Get( URL_Municipios,
+                      nil,
+                      nil
+                      );
+        Cidades.Clear;
+        FRetorno.Codigo   := Response.StatusCode;
+        FRetorno.Mensagem := Response.ContentAsString;
+        jsonarr    := TJSONObject.ParseJSONValue(TEncoding.UTF8.GetBytes( Response.ContentAsString ), 0) as TJSONArray;
+
+        for I := 0 to pred( jsonarr.count ) do
+        begin
+           obj    := TJsonObject.ParseJSONValue(jsonarr.Items[I].ToString) as TJsonObject;
+           Jobj   := obj.GetValue<TJSONObject>('microrregiao').GetValue<TJSONObject>('mesorregiao') as TJSONObject;
+           JsonUF := Jobj.GetValue<TJSONObject>('UF') as TJSONObject;
+
+           Cid := TCidades.create;
+           Cid.CodIBGE   := StrToInt( obj.GetValue('id').Value );
+           Cid.Municipio := obj.GetValue('nome').Value;
+           Cid.CodUF     := StrToInt( JsonUF.GetValue('id').Value );
+           Cid.UF        := JsonUF.GetValue('sigla').Value;
+
+           if FRemoveAcentos then
+            Cid.Municipio := RemoveAcento( Cid.Municipio );
+           if FLetrasMaiusculas then
+            Cid.Municipio := UpperCase( Cid.Municipio );
+
+           Cidades.add( Cid );
+        end;
+      except
+        on E:Exception do
+        begin
+             raise Exception.Create(E.Message);
+        end;
+      end;
+      if Response.StatusCode <> 200 then
+      begin
+         raise Exception.Create(Response.StatusCode.ToString + ' ' + Response.StatusText + ' ' + Response.ContentAsString);
+      end;
+    finally
+      if Assigned(HttpClient) then
+        FreeAndNil(HttpClient);
+    end;
+end;
+
+function TDTCidadesIBGE.ConsultaMunicipiosPorUF(UF: string): TCidades;
+var
+  Cid             : TCidades;
+  HttpClient      : THttpClient;
+  Response        : IHttpResponse;
+  Jobj,obj,JsonUF : TJSONObject;
+  jsonArr         : TJSONArray;
+  I               : Integer;
+begin
+    try
+      HttpClient := THttpClient.Create;
+      HttpClient.ContentType := 'application/json';
+      HttpClient.Accept      := '/';
+
+      try
+        Response := HttpClient.Get( URL_Municipios,
+                      nil,
+                      nil
+                      );
+        Cidades.Clear;
+        FRetorno.Codigo   := Response.StatusCode;
+        FRetorno.Mensagem := Response.ContentAsString;
+        jsonarr    := TJSONObject.ParseJSONValue(TEncoding.UTF8.GetBytes( Response.ContentAsString ), 0) as TJSONArray;
+
+        for I := 0 to pred( jsonarr.count ) do
+        begin
+           obj    := TJsonObject.ParseJSONValue(jsonarr.Items[I].ToString) as TJsonObject;
+           Jobj   := obj.GetValue<TJSONObject>('microrregiao').GetValue<TJSONObject>('mesorregiao') as TJSONObject;
+           JsonUF := Jobj.GetValue<TJSONObject>('UF') as TJSONObject;
+
+           Cid := TCidades.create;
+           Cid.CodIBGE   := StrToInt( obj.GetValue('id').Value );
+           Cid.Municipio := obj.GetValue('nome').Value;
+           Cid.CodUF     := StrToInt( JsonUF.GetValue('id').Value );
+           Cid.UF        := JsonUF.GetValue('sigla').Value;
+
+           if FRemoveAcentos then
+            Cid.Municipio := RemoveAcento( Cid.Municipio );
+           if FLetrasMaiusculas then
+            Cid.Municipio := UpperCase( Cid.Municipio );
+
+           Cidades.add( Cid );
+        end;
+      except
+        on E:Exception do
+        begin
+             raise Exception.Create(E.Message);
+        end;
+      end;
+      if Response.StatusCode <> 200 then
+      begin
+         raise Exception.Create(Response.StatusCode.ToString + ' ' + Response.StatusText + ' ' + Response.ContentAsString);
+      end;
+    finally
+      if Assigned(HttpClient) then
+        FreeAndNil(HttpClient);
+    end;
+end;
+
+constructor TDTCidadesIBGE.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+
+  Cidades    := TList<TCidades>.Create;
+end;
+
+destructor TDTCidadesIBGE.Destroy;
+begin
+  Cidades.Clear;
+
+  FreeAndNil(Cidades);
+
+  inherited Destroy;
+end;
+
+
+procedure TDTCidadesIBGE.SetLetrasMaiusculas(const Value: Boolean);
+begin
+  FLetrasMaiusculas := Value;
+end;
+
+procedure TDTCidadesIBGE.SetRemoveAcentos(const Value: Boolean);
+begin
+  FRemoveAcentos := Value;
+end;
+
+procedure TDTCidadesIBGE.SetRetorno(const Value: TRetorno);
+begin
+  FRetorno := Value;
+end;
+
+end.

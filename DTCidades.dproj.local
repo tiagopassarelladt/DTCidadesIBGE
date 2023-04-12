@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2023/04/12 12:55:21.000.364,=rtl.dcp</Transaction>
+    <Transaction>2023/04/12 12:55:34.000.645,C:\Users\Tiago Passarella\Documents\Embarcadero\Studio\Projects\Package1.dproj=C:\Users\Tiago Passarella\Documents\Embarcadero\Studio\Projects\CidadesIbge.dproj</Transaction>
+    <Transaction>2023/04/12 12:55:43.000.473,C:\Users\Tiago Passarella\Documents\Embarcadero\Studio\Projects\CidadesIbge.dproj=C:\Users\Tiago Passarella\Documents\Embarcadero\Studio\Projects\DTCidadesIbge.dproj</Transaction>
+    <Transaction>2023/04/12 12:57:16.000.312,=D:\Dropbox\Componentes\DTCidadesIBGE\DTCidadesIBGE.pas</Transaction>
+    <Transaction>2023/04/12 12:57:33.000.120,C:\Users\Tiago Passarella\Documents\Embarcadero\Studio\Projects\DTCidadesIbge.dproj=C:\Users\Tiago Passarella\Documents\Embarcadero\Studio\Projects\DTCidades.dproj</Transaction>
+    <Transaction>2023/04/12 12:57:39.000.902,C:\Users\Tiago Passarella\Documents\Embarcadero\Studio\Projects\DTCidades.dproj=D:\Dropbox\Componentes\DTCidadesIBGE\DTCidades.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

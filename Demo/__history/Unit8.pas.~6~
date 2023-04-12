@@ -1,0 +1,53 @@
+unit Unit8;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, DTCidadesIBGE;
+
+type
+  TForm8 = class(TForm)
+    Button1: TButton;
+    Memo1: TMemo;
+    DTCidadesIBGE1: TDTCidadesIBGE;
+    Button2: TButton;
+    procedure Button1Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form8: TForm8;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm8.Button1Click(Sender: TObject);
+var
+  I: Integer;
+begin
+     DTCidadesIBGE1.ConsultaMunicipios;
+
+     Memo1.Lines.Clear;
+
+     for I := 0 to Pred( DTCidadesIBGE1.Cidades.Count ) do
+     begin
+          Memo1.Lines.Add( 'CodIBGE: '   + DTCidadesIBGE1.Cidades[i].CodIBGE.ToString );
+          Memo1.Lines.Add( 'Municipio: ' + DTCidadesIBGE1.Cidades[i].Municipio );
+          Memo1.Lines.Add( 'CodUF: '     + DTCidadesIBGE1.Cidades[i].CodUF.ToString );
+          Memo1.Lines.Add( 'UF: '        + DTCidadesIBGE1.Cidades[i].UF );
+          Memo1.Lines.Add('===================================');
+
+          if i = 20 then
+          Exit;
+     end;
+
+     Memo1.Lines.Add('Total de Cidades localizadas: ' + DTCidadesIBGE1.Cidades.Count.ToString);
+
+end;
+
+end.

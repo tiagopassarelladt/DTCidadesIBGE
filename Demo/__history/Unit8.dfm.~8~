@@ -1,0 +1,53 @@
+object Form8: TForm8
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsSingle
+  Caption = 'Demo - DTCidadesIBGE'
+  ClientHeight = 381
+  ClientWidth = 352
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Button1: TButton
+    Left = 8
+    Top = 8
+    Width = 105
+    Height = 25
+    Cursor = crHandPoint
+    Caption = 'Consulta Cidades'
+    TabOrder = 0
+    OnClick = Button1Click
+  end
+  object Memo1: TMemo
+    Left = 8
+    Top = 39
+    Width = 329
+    Height = 334
+    Lines.Strings = (
+      'Memo1')
+    TabOrder = 1
+  end
+  object Button2: TButton
+    Left = 119
+    Top = 8
+    Width = 105
+    Height = 25
+    Caption = 'Cidades por UF'
+    TabOrder = 2
+    OnClick = Button2Click
+  end
+  object DTCidadesIBGE1: TDTCidadesIBGE
+    RemoveAcentos = True
+    LetrasMaiusculas = True
+    Left = 136
+    Top = 64
+  end
+end
